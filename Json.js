@@ -1,56 +1,76 @@
+var path = require('path'),
+    fs = require('fs');
+
 // Object Input
-objectData = {
+let objectData = {
     name: 'Manh',
     Age: 18,
     address: 'Hoai Duc Province'
 }
-let jsonContent = JSON.stringify(objectData)
 
-var path = require('path'),
-    fs = require('fs');
-
-
-let getfile = () => {
+function Handlefile() {
     let fileName1
     let fileName2
     let path2 = __dirname
-    const fs = require('fs');
+    let returnCode = {
+        saveSuccessfully: 1,
+        saveErr: 2,
+        fileNotExisted: 3,
+        readSuccessfully: 4
+    }
 
-    let editFile = {
-        getname: () => {
-            return fileName1
-        },
-        // name for read file
-        setName1: (name1) => {
-            fileName1 = name1
-        },
-        // name for write file
-        setName2: (name2) => {
-            fileName2 = name2
-        },
+    this.setName1 = (name) => {
+        fileName1 = name
+    }
 
-        readFile: () => {
-            fs.readFile(path2 + `\\${fileName1}`, 'utf8', function (err, data) {
-                if (err) {
-                    console.log('fileName ERR, reenter');
-                } else { console.log(data) }
-            })
-        },
-        saveFile: () => {
-            fs.writeFile(path2 + `\\${fileName2}`, jsonContent, 'utf8', function (err) {
-                if (err) {
-                    console.log("An error occured while writing JSON Object to File.");
-                }
-                console.log("JSON file has been saved.");
-            });
+    this.setName2= (name) => {
+        fileName2 = name
+    }
+
+    this.readFile= () => {
+        try{
+            let data = fs.readFileSync(path2 + `\\${fileName1}`,{encoding:'utf8'})
+            data = JSON.parse
+            return {
+                code: returnCode.readSuccessfully,
+                data: data,
+                message: null
+            }
+        }catch(err){
+            return {
+                code: returnCode.fileNotExisted,
+                data: null,
+                message: err
+            };
         }
     }
-    return editFile
-};
 
-let a = getfile()
-a.setName1('output.json')
-a.readFile()
-a.setName2('BaitapJson.json')
-a.saveFile()
+    this.saveFile= (objecInput) => {
+        let objStr = JSON.stringify(objecInput)
+        try{
+            fs.writeFileSync(path2 + `\\${fileName2}`, objStr)
+            return {
+                code: returnCode.saveSuccessfully,
+                data: null,
+                message: null
+            };
+        }catch(err){
+            return {
+                code: returnCode.saveErr,
+                data: null,
+                message: err
+            };
+        }
+    }
+}
 
+
+
+let handle = new Handlefile()
+handle.setName1('BaitapJson.json')
+// handle.setName2('BaitapJson.json')
+// handle.saveFile(objectData)
+let checkReadfile = handle.readFile()
+// let checkWriteFile = handle.saveFile(objectData)
+// console.log (checkWriteFile)
+console.log(checkReadfile)
